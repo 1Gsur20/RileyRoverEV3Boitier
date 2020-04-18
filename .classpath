@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.lejos.ev3.ldt.LEJOS_EV3_LIBRARY_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="C:/Users/Wizre/Downloads/junit-4.13-beta-1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Wizre/Downloads/leJOS_EV3_0.9.1-beta_win32/leJOS_EV3_0.9.1-beta_win32/lib/ev3/ev3classes.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
