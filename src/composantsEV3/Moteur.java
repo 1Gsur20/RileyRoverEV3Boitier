@@ -67,4 +67,10 @@ public class Moteur {
 	public boolean isStalled(){
 		return this.unMoteur.isStalled();
 	}
+
+	public EV3LargeRegulatedMotor getUnMoteur() {
+		return unMoteur;
+	}
+	
+	
 }

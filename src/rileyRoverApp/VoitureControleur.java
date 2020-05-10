@@ -12,6 +12,7 @@ import lejos.remote.nxt.BTConnection;
 import lejos.remote.nxt.BTConnector;
 import lejos.remote.nxt.NXTConnection;
 import lejos.robotics.EncoderMotor;
+import lejos.robotics.RegulatedMotor;
 import lejos.hardware.Button;
 import lejos.hardware.port.SensorPort;
 import lejos.utility.Delay;
@@ -79,6 +80,9 @@ public class VoitureControleur extends Thread{
 		capteurPresence = new PresenceCapteur(SensorPort.S1);
 		moteurDroit = new Moteur(MotorPort.C);
 		moteurGauche = new Moteur(MotorPort.B);
+		
+		RegulatedMotor listMotors[] = {moteurDroit.getUnMoteur()};
+		moteurGauche.getUnMoteur().synchronizeWith(listMotors);
 		
 		//Arrêt des différents moteurs par mesure de sécurité
 		moteurDroit.arret();
@@ -173,6 +177,7 @@ public class VoitureControleur extends Thread{
 	public static void avance() {
 		System.out.println("AVANCE");
 		VoitureControleur threadCapture = new VoitureControleur();
+		moteurGauche.getUnMoteur().startSynchronization();
 		threadCapture.start();
 		while(!capteurPresence.obstacleDetect()&&transmission!=3) {
 			moteurDroit.marche(true);
@@ -180,6 +185,7 @@ public class VoitureControleur extends Thread{
 			moteurDroit.accelere(vitesse);
 			moteurGauche.accelere(vitesse);
 		}
+		moteurGauche.getUnMoteur().endSynchronization();
 		arretMoteur();
 	}
 	/*
@@ -187,16 +193,20 @@ public class VoitureControleur extends Thread{
 	 */
 	public static void recul() {
 		System.out.println("RECUL");
+		moteurGauche.getUnMoteur().startSynchronization();
 		moteurDroit.marche(false);
 		moteurGauche.marche(false);
+		moteurGauche.getUnMoteur().endSynchronization();
 	}
 	/*
 	 * Arrête les moteurs
 	 */
 	public static void arretMoteur() {
 		System.out.println("ARRET");
+		moteurGauche.getUnMoteur().startSynchronization();
 		moteurDroit.arret();
 		moteurGauche.arret();
+		moteurGauche.getUnMoteur().endSynchronization();
 	}
 	/*
 	 * Change la vitesse de la voiture
