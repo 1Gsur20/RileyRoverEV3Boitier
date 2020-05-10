@@ -11,10 +11,7 @@ import lejos.hardware.port.MotorPort;
 import lejos.remote.nxt.BTConnection;
 import lejos.remote.nxt.BTConnector;
 import lejos.remote.nxt.NXTConnection;
-import lejos.robotics.EncoderMotor;
-import lejos.hardware.Button;
 import lejos.hardware.port.SensorPort;
-import lejos.utility.Delay;
 import lejos.hardware.Sound;
 
 
@@ -29,6 +26,7 @@ public class VoitureControleur extends Thread{
 	private static Moteur moteurDroit;
 	private static Moteur moteurGauche;
 	private static PresenceCapteur capteurPresence;
+	private static ContactSensor capteurContact;
 	
 	private static final int 
 	//Etats de la machine
@@ -38,9 +36,9 @@ public class VoitureControleur extends Thread{
 		TOURNE_DROITE=16,
 		TOURNE_GAUCHE=17,
 		KLAXONNE=18,
-	//Signal de l'arrÃªt de l'application
+	//Signal de l'arrêt de l'application
 		ARRET_APPLI=15,
-	//DiffÃ©rentes vitesses possibles pour la voiture
+	//Différentes vitesses possibles pour la voiture
 		VITESSE0=4,
 		VITESSE1=5,
 		VITESSE2=6,
@@ -65,32 +63,33 @@ public class VoitureControleur extends Thread{
 	}  
 	
 	/*
-	 * Classe main, lancÃ©e au dÃ©marrage de l'application
+	 * Classe main, lancée au démarrage de l'application
 	 */
 	public static void main(String[] args) {
 		
 		//Mise en place de la connexion bluetooth
 		bluetoothConnection();
 		
-		//Signalement que l'application est prÃªte
+		//Signalement que l'application est prête
 		appliPreteAMarcher(true);
 		
-		//Initialisation des diffÃ©rents composants de l'application
+		//Initialisation des différents composants de l'application
 		capteurPresence = new PresenceCapteur(SensorPort.S1);
 		moteurDroit = new Moteur(MotorPort.C);
 		moteurGauche = new Moteur(MotorPort.B);
+		capteurContact = new ContactSensor(SensorPort.S2);
 		
-		//ArrÃªt des diffÃ©rents moteurs par mesure de sÃ©curitÃ©
+		//Arrêt des différents moteurs par mesure de sécurité
 		moteurDroit.arret();
 		moteurGauche.arret();
 		
 		//Boucle fonctionnant tant que l'application est en marche
 		while(appliReady) {
 			try {
-				//Lecture des bytes envoyÃ©s depuis l'application
+				//Lecture des bytes envoyés depuis l'application
 				transmission = (int) donneeEntree.readByte();
 				
-				//Se place dans un Ã©tat en fonction du signal reÃ§u
+				//Se place dans un état en fonction du signal reçu
 				switch(transmission) {
 					case AVANCE:
 						avance();
@@ -157,8 +156,8 @@ public class VoitureControleur extends Thread{
 		}
 	}
 	/*
-	 * Permet l'Ã©coute des pÃ©riphÃ©riques bluetooth et la connexion Ã  l'application
-	 * Se base sur le boitier NXT (similaire Ã  EV3) pour effectuer la connexion
+	 * Permet l'écoute des périphériques bluetooth et la connexion à l'application
+	 * Se base sur le boitier NXT (similaire à EV3) pour effectuer la connexion
 	 */
 	public static void bluetoothConnection(){  
 	    System.out.println("En ecoute");
@@ -168,13 +167,13 @@ public class VoitureControleur extends Thread{
 	    donneeEntree = BTLink.openDataInputStream();
 	}
 	/*
-	 * Permet Ã  la voiture d'avancer
+	 * Permet à la voiture d'avancer
 	 */
 	public static void avance() {
 		System.out.println("AVANCE");
 		VoitureControleur threadCapture = new VoitureControleur();
 		threadCapture.start();
-		while(!capteurPresence.obstacleDetect()&&transmission!=3) {
+		while(!capteurPresence.obstacleDetect()&&transmission!=3 && !capteurContact.contactDetected() ) {
 			moteurDroit.marche(true);
 			moteurGauche.marche(true);
 			moteurDroit.accelere(vitesse);
@@ -183,7 +182,7 @@ public class VoitureControleur extends Thread{
 		arretMoteur();
 	}
 	/*
-	 * Permet Ã  la voiture de reculer
+	 * Permet à la voiture de reculer
 	 */
 	public static void recul() {
 		System.out.println("RECUL");
@@ -191,7 +190,7 @@ public class VoitureControleur extends Thread{
 		moteurGauche.marche(false);
 	}
 	/*
-	 * ArrÃªte les moteurs
+	 * Arrête les moteurs
 	 */
 	public static void arretMoteur() {
 		System.out.println("ARRET");
@@ -213,7 +212,7 @@ public class VoitureControleur extends Thread{
 		appliReady=statut;
 	}
 	/*
-	 * Tourne Ã  droite
+	 * Tourne à droite
 	 */
 	public static void tourneDroite() {
 		System.out.println("DROITE");
@@ -223,7 +222,7 @@ public class VoitureControleur extends Thread{
 		moteurDroit.accelere(1);
 	}
 	/*
-	 * Tourne Ã  gauche
+	 * Tourne à gauche
 	 */
 	public static void tourneGauche() {
 		System.out.println("GAUCHE");
@@ -233,7 +232,7 @@ public class VoitureControleur extends Thread{
 		moteurGauche.accelere(1);	
 	}
 	/*
-	 * Permet Ã  la voiture de klaxonner
+	 * Permet à la voiture de klaxonner
 	 */
 	public static void klaxonne() {
 		System.out.println("KLAXONNE");
