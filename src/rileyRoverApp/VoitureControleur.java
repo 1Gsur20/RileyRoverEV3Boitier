@@ -39,6 +39,8 @@ public class VoitureControleur extends Thread{
 		TOURNE_DROITE=16,
 		TOURNE_GAUCHE=17,
 		KLAXONNE=18,
+		MODE_AUTOMATIQUE=19,
+		MODE_MANUEL=20,
 	//Signal de l'arr�t de l'application
 		ARRET_APPLI=15,
 	//Diff�rentes vitesses possibles pour la voiture
@@ -57,13 +59,6 @@ public class VoitureControleur extends Thread{
 
 	private static int vitesse=0;
 	
-	public void run(){  
-		try {
-			transmission = (int) donneeEntree.readByte();
-		}catch(IOException e) {
-			System.out.println(e);
-		}
-	}  
 	
 	/*
 	 * Classe main, lanc�e au d�marrage de l'application
@@ -89,75 +84,90 @@ public class VoitureControleur extends Thread{
 		moteurDroit.arret();
 		moteurGauche.arret();
 		
+		// Création d'un thread pour écouter la télécommande.
+        new Thread() {
+            public void run() {
+            	for(;;) {
+                	try {
+    					transmission = (int) donneeEntree.readByte();
+    				} catch (IOException e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}	
+            	}
+
+            }   
+        }.start();
+		
 		//Boucle fonctionnant tant que l'application est en marche
 		while(appliReady) {
-			try {
-				//Lecture des bytes envoy�s depuis l'application
-				transmission = (int) donneeEntree.readByte();
-				
-				//Se place dans un �tat en fonction du signal re�u
-				switch(transmission) {
-					case AVANCE:
-						avance();
-						break;
-					case RECUL:
-						recul();
-						break;
-					case ARRET:
-						arretMoteur();
-						break;
-					case VITESSE0:
-						changementVitesse(0);
-						break;
-					case VITESSE1:
-						changementVitesse(1);
-						break;
-					case VITESSE2:
-						changementVitesse(2);
-						break;
-					case VITESSE3:
-						changementVitesse(3);
-						break;
-					case VITESSE4:
-						changementVitesse(4);
-						break;
-					case VITESSE5:
-						changementVitesse(5);
-						break;
-					case VITESSE6:
-						changementVitesse(6);
-						break;
-					case VITESSE7:
-						changementVitesse(7);
-						break;
-					case VITESSE8:
-						changementVitesse(8);
-						break;
-					case VITESSE9:
-						changementVitesse(9);
-						break;
-					case VITESSE10:
-						changementVitesse(10);
-						break;
-					case ARRET_APPLI:
-						appliPreteAMarcher(false);
-						break;
-					case TOURNE_DROITE:
-						tourneDroite();
-						break;
-					case TOURNE_GAUCHE:
-						tourneGauche();
-						break;
-					case KLAXONNE:
-						klaxonne();
-						break;
-					default:
-						break;
-				}
-				
-			} catch (IOException e) {
-				System.out.println(e);
-				System.exit(0);
+			//Lecture des bytes envoy�s depuis l'application
+			//transmission = (int) donneeEntree.readByte();
+			
+			//Se place dans un �tat en fonction du signal re�u
+			switch(transmission) {
+				case AVANCE:
+					avance();
+					break;
+				case RECUL:
+					recul();
+					break;
+				case ARRET:
+					arretMoteur();
+					break;
+				case VITESSE0:
+					changementVitesse(0);
+					break;
+				case VITESSE1:
+					changementVitesse(1);
+					break;
+				case VITESSE2:
+					changementVitesse(2);
+					break;
+				case VITESSE3:
+					changementVitesse(3);
+					break;
+				case VITESSE4:
+					changementVitesse(4);
+					break;
+				case VITESSE5:
+					changementVitesse(5);
+					break;
+				case VITESSE6:
+					changementVitesse(6);
+					break;
+				case VITESSE7:
+					changementVitesse(7);
+					break;
+				case VITESSE8:
+					changementVitesse(8);
+					break;
+				case VITESSE9:
+					changementVitesse(9);
+					break;
+				case VITESSE10:
+					changementVitesse(10);
+					break;
+				case ARRET_APPLI:
+					appliPreteAMarcher(false);
+					break;
+				case TOURNE_DROITE:
+					tourneDroite();
+					break;
+				case TOURNE_GAUCHE:
+					tourneGauche();
+					break;
+				case KLAXONNE:
+					klaxonne();
+					break;
+				case MODE_AUTOMATIQUE:
+					modeAuto();
+					break;
+				case MODE_MANUEL:
+					arretMoteur();
+					break;
+				default:
+					break;
 			}
 		}
 	}
@@ -172,22 +182,34 @@ public class VoitureControleur extends Thread{
 	    donneeSortie = BTLink.openDataOutputStream();
 	    donneeEntree = BTLink.openDataInputStream();
 	}
+	
+	public static void modeAuto() {
+		while(transmission == MODE_AUTOMATIQUE) {
+			if(!capteurPresence.obstacleDetect()) {
+				avance();
+			}
+			else if(capteurPresence.obstacleDetect()) {
+				tourneDroite();
+				try {
+					Thread.sleep(300);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 	/*
 	 * Permet � la voiture d'avancer
 	 */
 	public static void avance() {
 		System.out.println("AVANCE");
-		VoitureControleur threadCapture = new VoitureControleur();
 		moteurGauche.getUnMoteur().startSynchronization();
-		threadCapture.start();
-		while(!capteurPresence.obstacleDetect()&&transmission!=3 && !capteurContact.contactDetected() ) {
-			moteurDroit.marche(true);
-			moteurGauche.marche(true);
-			moteurDroit.accelere(vitesse);
-			moteurGauche.accelere(vitesse);
-		}
+		moteurDroit.accelere(vitesse);
+		moteurGauche.accelere(vitesse);
+		moteurDroit.marche(true);
+		moteurGauche.marche(true);
 		moteurGauche.getUnMoteur().endSynchronization();
-		arretMoteur();
 	}
 	/*
 	 * Permet � la voiture de reculer
