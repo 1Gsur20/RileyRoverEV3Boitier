@@ -188,6 +188,7 @@ public class VoitureControleur extends Thread{
 	public static void modeAuto() {
 		while(transmission == MODE_AUTOMATIQUE) {
 			if(!capteurPresence.obstacleDetect()) {
+				vitesseLumininosite();
 				avance();
 			}
 			else if(capteurPresence.obstacleDetect()) {
@@ -280,5 +281,32 @@ public class VoitureControleur extends Thread{
 	public static void klaxonne() {
 		System.out.println("KLAXONNE");
 		Sound.buzz();
+	}
+	
+	public static void vitesseLumininosite() {
+		
+		float luminosity = capteurCouleur.colorDetection();
+		
+		if (luminosity < 0.05) {
+			
+			changementVitesse(2);
+			
+		} else if (luminosity < 0.1) {
+			
+			changementVitesse(4);
+			
+		} else if (luminosity < 0.2) {
+			
+			changementVitesse(6);
+			
+		} else if (luminosity < 0.3) {
+			
+			changementVitesse(8);
+			
+		} else {
+			
+			changementVitesse(10);
+			
+		}
 	}
 }

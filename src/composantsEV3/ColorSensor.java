@@ -16,7 +16,7 @@ public class ColorSensor {
 	/* True si objet touche
 	   False sinon */
 	
-	public float contactDetected() {
+	public float colorDetection() {
 		
 		SampleProvider dataSensor = this.capteurCouleur.getAmbientMode();
 		int offsetSample = 0;
