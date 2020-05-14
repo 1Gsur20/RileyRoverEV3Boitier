@@ -30,6 +30,7 @@ public class VoitureControleur extends Thread{
 	private static Moteur moteurGauche;
 	private static PresenceCapteur capteurPresence;
 	private static ContactSensor capteurContact;
+	private static ColorSensor capteurCouleur;
 	
 	private static final int 
 	//Etats de la machine
@@ -72,10 +73,11 @@ public class VoitureControleur extends Thread{
 		appliPreteAMarcher(true);
 		
 		//Initialisation des diff�rents composants de l'application
-		capteurPresence = new PresenceCapteur(SensorPort.S1);
 		moteurDroit = new Moteur(MotorPort.C);
 		moteurGauche = new Moteur(MotorPort.B);
+		capteurPresence = new PresenceCapteur(SensorPort.S1);
 		capteurContact = new ContactSensor(SensorPort.S2);
+		capteurCouleur = new ColorSensor(SensorPort.S3);
 		
 		RegulatedMotor listMotors[] = {moteurDroit.getUnMoteur()};
 		moteurGauche.getUnMoteur().synchronizeWith(listMotors);
