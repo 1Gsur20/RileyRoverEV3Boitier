@@ -110,7 +110,7 @@ public class VoitureControleur extends Thread{
 					avance();
 					break;
 				case RECUL:
-					recul();
+					reculSecurise();
 					break;
 				case ARRET:
 					arretMoteur();
@@ -210,6 +210,13 @@ public class VoitureControleur extends Thread{
 		moteurDroit.marche(true);
 		moteurGauche.marche(true);
 		moteurGauche.getUnMoteur().endSynchronization();
+	}
+	public static void reculSecurise() {
+		if(!capteurContact.contactDetected()) {
+			recul();
+		}else {
+			arretMoteur();
+		}
 	}
 	/*
 	 * Permet � la voiture de reculer
