@@ -15,7 +15,9 @@ import lejos.robotics.EncoderMotor;
 import lejos.robotics.RegulatedMotor;
 import lejos.hardware.Button;
 import lejos.hardware.port.SensorPort;
+import lejos.internal.ev3.EV3Battery;
 import lejos.hardware.Sound;
+import lejos.hardware.Battery;
 
 
 public class VoitureControleur extends Thread{
@@ -25,6 +27,8 @@ public class VoitureControleur extends Thread{
 	private static BTConnection BTLink;
 	private static boolean appliReady;
 	private static int transmission=0;
+	//private Battery battery;
+	//Valeur max 8400 min 6300
 	
 	private static Moteur moteurDroit;
 	private static Moteur moteurGauche;
@@ -99,6 +103,20 @@ public class VoitureControleur extends Thread{
             	}
 
             }   
+        }.start();
+        
+        new Thread() {
+        	public void run() {
+        		for(;;) {
+    				try {
+						donneeSortie.write(Battery.getVoltageMilliVolt());
+						System.out.println(Battery.getVoltageMilliVolt());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+        		}
+        	}
         }.start();
 		
 		//Boucle fonctionnant tant que l'application est en marche
@@ -188,6 +206,7 @@ public class VoitureControleur extends Thread{
 	public static void modeAuto() {
 		while(transmission == MODE_AUTOMATIQUE) {
 			if(!capteurPresence.obstacleDetect()) {
+				vitesseLumininosite();
 				avance();
 			}
 			else if(capteurPresence.obstacleDetect()) {
@@ -280,5 +299,32 @@ public class VoitureControleur extends Thread{
 	public static void klaxonne() {
 		System.out.println("KLAXONNE");
 		Sound.buzz();
+	}
+	
+	public static void vitesseLumininosite() {
+
+		float luminosity = capteurCouleur.colorDetection();
+
+		if (luminosity < 0.05) {
+
+			changementVitesse(2);
+
+		} else if (luminosity < 0.1) {
+
+			changementVitesse(4);
+
+		} else if (luminosity < 0.2) {
+
+			changementVitesse(6);
+
+		} else if (luminosity < 0.3) {
+
+			changementVitesse(8);
+
+		} else {
+
+			changementVitesse(10);
+
+		}
 	}
 }
