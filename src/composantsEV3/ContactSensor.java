@@ -25,7 +25,6 @@ public class ContactSensor {
 		
 		this.capteurContact.fetchSample(sample, offsetSample);
 		
-		// Int ? 
 		int valueDetection = (int)sample[0];
 		
 		if(valueDetection == 1) {

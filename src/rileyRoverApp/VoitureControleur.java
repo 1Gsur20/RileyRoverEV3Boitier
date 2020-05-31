@@ -303,7 +303,7 @@ public class VoitureControleur extends Thread{
 	}
 	
 	public static void vitesseLumininosite() {
-
+		
 		float luminosity = capteurCouleur.colorDetection();
 
 		if (luminosity < 0.05) {
