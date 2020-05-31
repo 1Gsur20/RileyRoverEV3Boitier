@@ -63,6 +63,7 @@ public class VoitureControleur extends Thread{
 																		
 
 	private static int vitesse=0;
+	private static boolean klaxon = false;
 	
 	
 	/*
@@ -109,8 +110,8 @@ public class VoitureControleur extends Thread{
         	public void run() {
         		for(;;) {
     				try {
-						donneeSortie.write(Battery.getVoltageMilliVolt());
-						System.out.println(Battery.getVoltageMilliVolt());
+						donneeSortie.writeInt(Battery.getVoltageMilliVolt());
+    					System.out.println(Battery.getVoltageMilliVolt());
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
